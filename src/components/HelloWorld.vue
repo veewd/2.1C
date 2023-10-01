@@ -1,58 +1,118 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
+  <div class="todo-app">
+    <h1>Todo App</h1>
+    <h2>My Tasks</h2> <!-- Added heading for "My Tasks" -->
+    <input v-model="newTask" @keyup.enter="addTask" placeholder="Enter a new task">
+    
+    <button @click="toggleCompletedTasks">{{ showCompleted ? 'Hide Completed Tasks' : 'Show Completed Tasks' }}</button>
+    
     <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
+      <li v-for="(task, index) in filteredTasks" :key="index" v-show="showTask(task)">
+        <input type="checkbox" v-model="task.completed">
+        <span :class="{ completed: task.completed }">{{ task.text }}</span>
+        <button @click="removeTask(index)">Remove</button>
+      </li>
     </ul>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+  data() {
+    return {
+      newTask: '',
+      tasks: [],
+      showCompleted: true
+    };
+  },
+  methods: {
+    addTask() {
+      if (this.newTask.trim() !== '') {
+        this.tasks.push({
+          text: this.newTask,
+          completed: false
+        });
+        this.newTask = '';
+      }
+    },
+    removeTask(index) {
+      this.tasks.splice(index, 1);
+    },
+    toggleCompletedTasks() {
+      this.showCompleted = !this.showCompleted;
+    },
+    showTask(task) {
+      return this.showCompleted || !task.completed;
+    }
+  },
+  computed: {
+    filteredTasks() {
+      return this.tasks.filter(task => this.showTask(task));
+    }
   }
-}
+};
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.todo-app {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
+
+h1 {
+  color: #333;
+}
+
+input {
+  padding: 10px;
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #f44336;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #d32f2f;
+}
+
 ul {
-  list-style-type: none;
+  list-style: none;
   padding: 0;
 }
+
 li {
-  display: inline-block;
-  margin: 0 10px;
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
 }
-a {
-  color: #42b983;
+
+li:hover {
+  transform: scale(1.02);
 }
+
+.completed {
+  text-decoration: line-through;
+  color: #888;
+}
+
 </style>
